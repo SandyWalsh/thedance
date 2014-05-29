@@ -1,16 +1,18 @@
-import random
-
+"""This is just the sequence manager, we have no concept
+   of "current direction" ... that's left to the device to
+   track. We only care about which direction we should be
+   pointing at a given time."""
 
 class Participant(object):
     def __init__(self):
         self.sequence = []
-        self.current_direction = random.randrange(360)
+        self.direction = 0
 
     def add(self, dot):
         self.sequence.append(dot)
 
     def __str__(self):
-        return str(self.current_direction)
+        return str(self.direction)
 
 
 class Grid(object):
@@ -19,8 +21,8 @@ class Grid(object):
         self.size_y = size_y
         self.grid = [[Participant() for x in range(size_x)] for x in range(size_y)]
 
-    def set(self, x, y, dot):
-        self.grid[y][x] = dot
+    def set(self, x, y, direction):
+        self.grid[y][x].direction = direction
 
     def get(self, x, y):
         return self.grid[y][x]
@@ -58,16 +60,15 @@ class Movement(object):
         """Compute the distance to the target if
            we're moving in a clockwise or counterclockwise
            direction."""
-        current_direction = self.participant.current_direction
+        direction = self.participant.direction
         if moving > 0:
-            if current_direction < self.target_direction:
-                return 360 - current_direction + self.target_direction
-            return self.target_direction - current_direction
+            if direction < self.target_direction:
+                return 360 - direction + self.target_direction
+            return self.target_direction - direction
         else:
-            if current_direction < self.target_direction:
-                return current_direction - self.target_direction
-            return 360 - self.target_direction + current_direction
-
+            if direction < self.target_direction:
+                return direction - self.target_direction
+            return 360 - self.target_direction + direction
 
     def move_to_direction(self, target_direction, movement, millis):
         # millis = 250 would mean instant transportation to target.
@@ -81,4 +82,4 @@ class Movement(object):
         self.participant = participant
 
     def increment(self):
-        self.participant.current_position + (self.speed * self.movement)
+        self.participant.direction + (self.speed * self.movement)
